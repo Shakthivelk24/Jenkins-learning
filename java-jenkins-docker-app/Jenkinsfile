@@ -1,0 +1,72 @@
+pipeline {
+    agent {
+        label 'shakthiAgent'
+    }
+    stages {
+        stage('Clone Github Repo') {
+            steps {
+                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/Shakthivelk24/Jenkins-learning'
+            }
+        }
+        stage('Build') {
+            steps {
+                dir('java-jenkins-docker-app') {
+                    sh 'mvn clean package'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                dir('java-jenkins-docker-app') {
+                    sh 'mvn test'
+                }
+            }
+        }
+        stage('Compile') {
+            steps {
+                dir('java-jenkins-docker-app') {
+                    sh 'mvn test'
+                }
+            }
+        }
+        stage('Docker image build') {
+            steps {
+                dir('java-jenkins-docker-app') {
+                    sh 'echo "Building Docker image"'
+                    sh 'docker build -t java-jenkins-docker:latest .'
+                }
+            }
+        }
+        stage('Docker image Running') {
+            steps {
+                dir('java-jenkins-docker-app') {
+                    sh 'echo "Running the image"'
+                    sh 'docker run --rm java-jenkins-docker:latest'
+                }
+            }
+        }
+        stage('Docker image tag') {
+            steps {
+                dir('java-jenkins-docker-app') {
+                    sh 'echo "Docker Tag"'
+                    sh 'docker tag java-jenkins-docker:latest shakthivelk24/java-jenkins-docker:latest'
+                }
+            }
+        }
+        stage('Docker image Push to Docker Hub') {
+            steps {
+                dir('java-jenkins-docker-app') {
+                    sh 'echo "Pushing the image to Docker Hub"'
+                    sh 'docker push shakthivelk24/java-jenkins-docker:latest'
+                }
+            }
+        }
+        stage('Clean work Space') {
+            steps {
+                dir('java-jenkins-docker-app') {
+                    cleanWs()
+                }
+            }
+        }
+    }
+}
