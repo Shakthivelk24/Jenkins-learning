@@ -1,0 +1,72 @@
+pipeline {
+    agent {
+        label 'shakthiAgent'
+    }
+    stages {
+        stage('Clone Github Repo') {
+            steps {
+                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/Shakthivelk24/Jenkins-learning'
+            }
+        }
+        stage('Local Compilation') {
+            steps {
+                dir('python-jenkins-docker-app')  {
+                    sh 'python -m py_compile app.py'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                dir('python-jenkins-docker-app')  {
+                    sh 'python -m unittest discover tests'
+                }
+            }
+        }
+        stage('Run Locally') {
+            steps {
+                dir('python-jenkins-docker-app')  {
+                    sh 'python app.py'
+                }
+            }
+        }
+        stage('Docker image build') {
+            steps {
+                dir('python-jenkins-docker-app')  {
+                    sh 'echo "Building Docker image"'
+                    sh 'docker build -t python-jenkins-docker:latest .'
+                }
+            }
+        }
+        stage('Docker image Running') {
+            steps {
+                dir('python-jenkins-docker-app')  {
+                    sh 'echo "Running the image"'
+                    sh 'docker run --rm python-jenkins-docker:latest'
+                }
+            }
+        }
+        stage('Docker image tag') {
+            steps {
+                dir('python-jenkins-docker-app')  {
+                    sh 'echo "Docker Tag"'
+                    sh 'docker tag python-jenkins-docker:latest shakthivelk24/python-jenkins-docker:latest'
+                }
+            }
+        }
+        stage('Docker image Push to Docker Hub') {
+            steps {
+                dir('python-jenkins-docker-app')  {
+                    sh 'echo "Pushing the image to Docker Hub"'
+                    sh 'docker push shakthivelk24/python-jenkins-docker:latest'
+                }
+            }
+        }
+        stage('Clean work Space') {
+            steps {
+               dir('python-jenkins-docker-app')  {
+                    cleanWs()
+                }
+            }
+        }
+    }
+}
