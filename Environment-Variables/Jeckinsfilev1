@@ -1,0 +1,51 @@
+pipeline {
+    agent {
+        label 'shakthiAgent'
+    }
+
+    environment {
+        DOCKER_IMAGE = "shakthivelk24/python-jenkins-docker:latest"
+        APP_Name = "shakthivelk24/python-webapp"
+        TAG_VERSION = "v1.0.0"
+    }
+
+    stages {
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'DockerHub',
+                    usernameVariable: 'DockerUser',
+                    passwordVariable: 'DockerPass'
+                )]) {
+                    echo "Logging into Docker Hub"
+                    sh 'echo "$DockerPass" | docker login -u "$DockerUser" --password-stdin'
+                    echo "Docker Login Completed Successfully"
+                }
+            }
+        }
+
+        stage('Docker Pull Image') {
+            steps {
+                echo "Pulling Docker Image"
+                sh 'docker pull $DOCKER_IMAGE'
+                echo "Docker Pull Completed Successfully"
+            }
+        }
+        
+        stage('Docker Tag') {
+            steps {
+                echo "Docker image tagging in progress"
+                sh 'docker tag $DOCKER_IMAGE $APP_Name:$TAG_VERSION'
+                echo "Docker tag Completed Successfully"
+            }
+        }
+         stage('Docker Pushing') {
+            steps {
+                echo "Docker push  in progress"
+                sh 'docker push  $APP_Name:$TAG_VERSION'
+                echo "Docker push Completed Successfully"
+            }
+        }
+    }
+}
