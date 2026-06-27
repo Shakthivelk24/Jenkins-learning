@@ -1,0 +1,22 @@
+pipeline {
+    agent {
+        label 'shakthiAgent'
+    }
+
+    stages {
+        stage('Printing the UserName of Docker') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'DockerHubPass', usernameVariable: 'DockerHubUser')]) {
+                  echo "Hello world"
+                  echo "Docker is user is :${DockerHubUser}"
+                }
+            }
+        }
+        stage('Build Credentials') {
+            steps {
+                echo "Running build number: $BUILD_NUMBER"
+                
+            }
+        }
+    }
+}
