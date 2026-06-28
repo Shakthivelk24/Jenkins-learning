@@ -1,285 +1,230 @@
+```html
 {% extends "base.html" %}
 
 {% block title %}Home • Shakthi Vel K{% endblock %}
 
 {% block content %}
-<section class="hero hero-youtuber">
+
+<section class="hero hero-portfolio">
+
     <div class="hero-photo-wrap">
-        <img class="hero-photo"
-             src="{{ url_for('static', filename='img/hero.jpg') }}"
-             alt="Shakthi Vel K">
+        <img
+            class="hero-photo"
+            src="{{ url_for('static', filename='img/hero.png') }}"
+            alt="Shakthi Vel K">
+
         <span class="photo-glow"></span>
     </div>
 
     <div class="hero-text">
         <h1>Shakthi Vel K</h1>
-        <h2>MERN Stack Developer • DevOps Engineer • Cloud Enthusiast</h2>
+
+        <h2>
+            MERN Stack Developer • DevOps Engineer • Cloud Enthusiast
+        </h2>
 
         <p class="tagline">
-            Passionate about building scalable web applications, automating
-            CI/CD pipelines, deploying cloud-native applications, and
-            continuously learning modern technologies.
+            Passionate about building scalable web applications,
+            automating CI/CD pipelines, deploying cloud-native
+            applications, and continuously learning modern technologies.
         </p>
 
         <div class="hero-actions">
-            <a class="btn"
-               href="https://github.com/Shakthivelk24"
-               target="_blank"
-               rel="noopener">
-                💻 View GitHub
+
+            <a
+                class="btn"
+                href="{{ GITHUB_URL }}"
+                target="_blank">
+                💻 GitHub
             </a>
 
-            <a class="btn"
-               href="https://www.linkedin.com/in/shakthi-vel-k-b35484343/"
-               target="_blank"
-               rel="noopener">
-                ↗ Connect on LinkedIn
+            <a
+                class="btn"
+                href="{{ LINKEDIN_URL }}"
+                target="_blank">
+                🔗 LinkedIn
             </a>
+
         </div>
     </div>
+
 </section>
 
-<section class="grid">
-    {% for key, p in PLAYLISTS.items() %}
-    <a class="card" href="/{{ key }}">
-        <div class="card-glow"></div>
-        <div class="card-body">
-            <h2>{{ p.title }}</h2>
-            <p>Click to open playlist ➜</p>
-        </div>
-    </a>
-    {% endfor %}
+<section class="projects">
+
+    <h2 class="section-title">
+        🚀 Featured Projects
+    </h2>
+
+    <div class="grid">
+
+        {% for key, project in PROJECTS.items() %}
+
+        <a class="card" href="/project/{{ key }}">
+
+            <div class="card-glow"></div>
+
+            <div class="card-body">
+
+                <h2>{{ project.title }}</h2>
+
+                <p>{{ project.description }}</p>
+
+                <span class="view-project">
+                    View Project →
+                </span>
+
+            </div>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
 </section>
-
-<script>
-(function () {
-    const root = document.getElementById("sg-carousel");
-    if (!root) return;
-
-    const slidesWrap = root.querySelector(".slides");
-    const slides = Array.from(slidesWrap.querySelectorAll("img"));
-
-    const prevBtn = root.querySelector(".prev");
-    const nextBtn = root.querySelector(".next");
-    const dotsWrap = root.querySelector(".dots");
-
-    let idx = 0;
-    let timer = null;
-    const duration = 5000;
-
-    function renderDots() {
-        dotsWrap.innerHTML = "";
-
-        slides.forEach((_, i) => {
-            const dot = document.createElement("button");
-
-            dot.className = "dot" + (i === idx ? " active" : "");
-
-            dot.onclick = () => go(i);
-
-            dotsWrap.appendChild(dot);
-        });
-    }
-
-    function go(i) {
-        idx = (i + slides.length) % slides.length;
-
-        slidesWrap.style.transform =
-            `translateX(-${idx * 100}%)`;
-
-        renderDots();
-
-        restart();
-    }
-
-    function next() {
-        go(idx + 1);
-    }
-
-    function prev() {
-        go(idx - 1);
-    }
-
-    function start() {
-        timer = setInterval(next, duration);
-    }
-
-    function stop() {
-        clearInterval(timer);
-    }
-
-    function restart() {
-        stop();
-        start();
-    }
-
-    nextBtn.addEventListener("click", next);
-    prevBtn.addEventListener("click", prev);
-
-    root.addEventListener("mouseenter", stop);
-    root.addEventListener("mouseleave", start);
-
-    slidesWrap.style.width = `${slides.length * 100}%`;
-
-    slides.forEach(slide => {
-        slide.style.width = `${100 / slides.length}%`;
-    });
-
-    renderDots();
-
-    start();
-})();
-</script>
 
 <style>
-.hero-youtuber{
+
+.hero-portfolio{
     display:grid;
-    grid-template-columns:160px 1fr;
-    gap:22px;
+    grid-template-columns:170px 1fr;
+    gap:30px;
     align-items:center;
-    margin:15px 0;
+    margin:30px 0;
 }
 
-@media(min-width:760px){
-.hero-youtuber{
-grid-template-columns:220px 1fr;
-gap:28px;
+@media(max-width:768px){
+
+.hero-portfolio{
+    grid-template-columns:1fr;
+    text-align:center;
 }
+
 }
 
 .hero-photo-wrap{
-position:relative;
-width:160px;
-height:200px;
-margin:auto;
-overflow:hidden;
-border-radius:20px;
-box-shadow:var(--shadow);
-}
-
-@media(min-width:760px){
-.hero-photo-wrap{
-width:220px;
-height:280px;
-}
+    position:relative;
+    width:170px;
+    height:170px;
+    margin:auto;
 }
 
 .hero-photo{
-width:100%;
-height:100%;
-object-fit:cover;
-display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid rgba(255,255,255,.1);
 }
 
 .photo-glow{
-position:absolute;
-inset:-10%;
-background:radial-gradient(circle,
-rgba(0,229,255,.35),
-transparent 70%);
-filter:blur(20px);
-pointer-events:none;
+    position:absolute;
+    inset:-10px;
+    border-radius:50%;
+    filter:blur(25px);
+    background:rgba(0,229,255,.35);
+    z-index:-1;
 }
 
 .hero-text h1{
-margin:0;
-font-size:2.2rem;
+    font-size:2.5rem;
+    margin-bottom:8px;
 }
 
 .hero-text h2{
-margin:10px 0;
-color:var(--muted);
-font-size:1.1rem;
+    color:#8fa3bf;
+    margin-bottom:18px;
 }
 
 .tagline{
-max-width:700px;
-line-height:1.7;
-margin-bottom:18px;
+    max-width:700px;
+    line-height:1.8;
+    color:#cfd8e3;
 }
 
 .hero-actions{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-top:25px;
 }
 
 .btn{
-padding:12px 20px;
-border-radius:10px;
-text-decoration:none;
-font-weight:600;
-transition:.3s;
+    padding:12px 22px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    background:#2563eb;
+    color:#fff;
+    transition:.3s;
 }
 
 .btn:hover{
-transform:translateY(-3px);
+    transform:translateY(-3px);
+    background:#1d4ed8;
 }
 
-.carousel-section{
-margin-top:30px;
+.projects{
+    margin-top:60px;
 }
 
-.carousel{
-position:relative;
-overflow:hidden;
-border-radius:16px;
+.section-title{
+    text-align:center;
+    margin-bottom:30px;
+    font-size:2rem;
 }
 
-.slides{
-display:flex;
-transition:.6s;
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
 }
 
-.carousel img{
-width:100%;
-aspect-ratio:16/9;
-object-fit:cover;
+.card{
+    position:relative;
+    overflow:hidden;
+    text-decoration:none;
+    color:inherit;
+    border-radius:18px;
+    background:#1f2937;
+    transition:.3s;
 }
 
-.nav{
-position:absolute;
-top:50%;
-transform:translateY(-50%);
-width:40px;
-height:40px;
-border-radius:50%;
-cursor:pointer;
-display:grid;
-place-items:center;
-background:rgba(0,0,0,.4);
-color:#fff;
+.card:hover{
+    transform:translateY(-8px);
 }
 
-.prev{
-left:10px;
+.card-glow{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(
+        135deg,
+        rgba(37,99,235,.3),
+        rgba(59,130,246,.1)
+    );
 }
 
-.next{
-right:10px;
+.card-body{
+    position:relative;
+    padding:25px;
 }
 
-.dots{
-position:absolute;
-bottom:12px;
-left:50%;
-transform:translateX(-50%);
-display:flex;
-gap:8px;
+.card-body h2{
+    margin-bottom:12px;
 }
 
-.dot{
-width:10px;
-height:10px;
-border-radius:50%;
-cursor:pointer;
-background:#777;
-border:none;
+.card-body p{
+    color:#cbd5e1;
+    margin-bottom:18px;
 }
 
-.dot.active{
-background:#fff;
+.view-project{
+    color:#60a5fa;
+    font-weight:600;
 }
+
 </style>
 
 {% endblock %}
+```

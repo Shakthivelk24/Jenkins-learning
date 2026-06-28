@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} • Shakthi Vel K{% endblock %}
+
+{% block content %}
+
+<section class="project-hero" style="--hero-gradient: {{ gradient }};">
+    <h1>{{ title }}</h1>
+    <p>{{ description }}</p>
+</section>
+
+<section class="project-container">
+
+    <div class="project-card">
+
+        <h2>Project Overview</h2>
+
+        <p>
+            {{ description }}
+        </p>
+
+        <div class="project-actions">
+
+            <a class="btn"
+               href="{{ project_url }}"
+               target="_blank"
+               rel="noopener">
+                💻 View Source Code
+            </a>
+
+            <a class="btn"
+               href="{{ GITHUB_URL }}"
+               target="_blank"
+               rel="noopener">
+                ⭐ GitHub Profile
+            </a>
+
+            <a class="btn"
+               href="/"
+               rel="noopener">
+                ← Back to Home
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+<style>
+
+.project-hero{
+    background:var(--hero-gradient);
+    padding:60px 30px;
+    border-radius:20px;
+    text-align:center;
+    color:white;
+    margin-bottom:40px;
+}
+
+.project-hero h1{
+    font-size:3rem;
+    margin-bottom:10px;
+}
+
+.project-hero p{
+    font-size:1.2rem;
+    opacity:.9;
+}
+
+.project-container{
+    display:flex;
+    justify-content:center;
+    margin-bottom:40px;
+}
+
+.project-card{
+    width:100%;
+    max-width:850px;
+    background:#1f2937;
+    color:white;
+    padding:35px;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.3);
+}
+
+.project-card h2{
+    margin-bottom:15px;
+}
+
+.project-card p{
+    line-height:1.8;
+    color:#d1d5db;
+}
+
+.project-actions{
+    margin-top:30px;
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.project-actions .btn{
+    padding:12px 22px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    background:#2563eb;
+    color:white;
+    transition:.3s;
+}
+
+.project-actions .btn:hover{
+    background:#1d4ed8;
+    transform:translateY(-2px);
+}
+
+@media(max-width:768px){
+
+.project-hero h1{
+    font-size:2rem;
+}
+
+.project-card{
+    padding:25px;
+}
+
+.project-actions{
+    flex-direction:column;
+}
+
+.project-actions .btn{
+    text-align:center;
+}
+
+}
+
+</style>
+
+{% endblock %}
