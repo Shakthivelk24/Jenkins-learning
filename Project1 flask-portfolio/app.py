@@ -1,65 +1,78 @@
-
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Channel + playlist IDs
-CHANNEL_URL = "https://www.youtube.com/shubhamgourtech"
-PLAYLISTS = {
-    "jenkins": {
-        "title": "🧩 Jenkins Playlist",
-        "list_id": "PLBr8obKbpkYvJEaPmrzhHhwx8uPj8WYbg",
-        "gradient": "linear-gradient(135deg, #ff0844 0%, #ffb199 100%)"
-    },
-    "docker": {
-        "title": "🐳 Docker Playlist",
-        "list_id": "PLBr8obKbpkYsFtSF1XY9rM_3LH8LKRwSw",
+# GitHub Profile
+GITHUB_URL = "https://github.com/Shakthivelk24"
+
+# LinkedIn Profile
+LINKEDIN_URL = "https://www.linkedin.com/in/shakthi-vel-k-b35484343/"
+
+# Projects
+PROJECTS = {
+    "dropzone": {
+        "title": "☁️ DropZone",
+        "description": "Cloud-based File Storage System built using the MERN stack with Cloudinary integration.",
+        "url": "https://github.com/Shakthivelk24/DropZone",
         "gradient": "linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)"
     },
-    "github": {
-        "title": "💻 GitHub Playlist",
-        "list_id": "PLBr8obKbpkYt679NgO1KqZOoY_QYYLBl2",
+    "aqualens": {
+        "title": "🐟 AquaLens AI",
+        "description": "AI-powered Fish Disease Detection using Deep Learning and Computer Vision.",
+        "url": "https://github.com/Shakthivelk24/AquaLens-AI",
+        "gradient": "linear-gradient(135deg, #43cea2 0%, #185a9d 100%)"
+    },
+    "magistra": {
+        "title": "🎓 Magistra",
+        "description": "An AI Teacher Assistant Platform powered by Gemini AI.",
+        "url": "https://github.com/Shakthivelk24/Magistra",
         "gradient": "linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)"
     },
-    "aws": {
-        "title": "☁️ AWS Playlist",
-        "list_id": "PLBr8obKbpkYtn5eIK3iTgiV7MSgFwO-tr",
-        "gradient": "linear-gradient(135deg, #f7971e 0%, #ffd200 100%)"
+    "2dgame": {
+        "title": "🎮 Blue Boy Adventure",
+        "description": "A Java-based 2D Platform Adventure Game.",
+        "url": "https://github.com/Shakthivelk24/2DGame",
+        "gradient": "linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)"
     }
 }
 
+
 @app.context_processor
 def inject_globals():
-    return {"CHANNEL_URL": CHANNEL_URL, "PLAYLISTS": PLAYLISTS}
+    return {
+        "GITHUB_URL": GITHUB_URL,
+        "LINKEDIN_URL": LINKEDIN_URL,
+        "PROJECTS": PROJECTS,
+        "current_year": datetime.now().year
+    }
+
 
 @app.route("/")
 def index():
-    # Build cards from PLAYLISTS
-    cards = [
-        {"key": k, "title": v["title"], "url": f"/{k}"}
-        for k, v in PLAYLISTS.items()
-    ]
-    return render_template("index.html", cards=cards)
+    return render_template("index.html")
 
-@app.route("/jenkins")
-def jenkins():
-    p = PLAYLISTS["jenkins"]
-    return render_template("playlist.html", title=p["title"], list_id=p["list_id"], gradient=p["gradient"])
 
-@app.route("/docker")
-def docker():
-    p = PLAYLISTS["docker"]
-    return render_template("playlist.html", title=p["title"], list_id=p["list_id"], gradient=p["gradient"])
+@app.route("/project/<project_name>")
+def project(project_name):
+    project = PROJECTS.get(project_name)
 
-@app.route("/github")
-def github():
-    p = PLAYLISTS["github"]
-    return render_template("playlist.html", title=p["title"], list_id=p["list_id"], gradient=p["gradient"])
+    if not project:
+        return "Project Not Found", 404
 
-@app.route("/aws")
-def aws():
-    p = PLAYLISTS["aws"]
-    return render_template("playlist.html", title=p["title"], list_id=p["list_id"], gradient=p["gradient"])
+    return render_template(
+        "project.html",
+        title=project["title"],
+        description=project["description"],
+        project_url=project["url"],
+        gradient=project["gradient"]
+    )
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template("404.html"), 404
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
