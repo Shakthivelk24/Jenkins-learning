@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('DockerHub')
+        IMAGE_NAME = 'shakthivelk24/flask-portfolio'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/Shakthivelk24/Jenkins-learning.git'
+            }
+        }
+
+        stage('Run Lint Test') {
+            steps {
+                dir('Project1 flask-portfolio') {
+                  sh 'pip install --break-system-packages flake8'
+                  sh 'flake8 . || true'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('Project1 flask-portfolio') {
+                  sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER .'
+                }
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    dir('Project1 flask-portfolio') {
+                      sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                      sh 'docker push $IMAGE_NAME:$BUILD_NUMBER'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Stage') {
+            steps {
+                dir('Project1 flask-portfolio') {
+                    sh 'docker run -d -p 5000:5000 $IMAGE_NAME:$BUILD_NUMBER'
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo '✅ Build, Test, and Deploy completed successfully!' }
+        failure { echo '❌ Pipeline failed. Check logs.' }
+    }
+}
