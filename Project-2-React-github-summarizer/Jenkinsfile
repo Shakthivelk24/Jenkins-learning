@@ -1,6 +1,6 @@
 pipeline {
     agent {
-      label 'shakthiAgent'
+        label 'shakthiAgent'
     }
 
     tools {
@@ -8,13 +8,12 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "shakthivelk24/github-profile-summarizer"
+        IMAGE_NAME = 'shakthivelk24/github-profile-summarizer'
         IMAGE_TAG = "v${BUILD_NUMBER}"
-        MAX_REPOS = "50"
+        MAX_REPOS = '50'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -33,6 +32,17 @@ pipeline {
                         '''
                     }
                 }
+            }
+        }
+        stage('Debug Node') {
+            steps {
+                sh '''
+                which node
+                which npm
+                node -v
+                npm -v
+                echo $PATH
+               '''
             }
         }
 
@@ -104,22 +114,21 @@ pipeline {
                 """
             }
         }
-
     }
 
     post {
         always {
-            echo "Build Completed"
+            echo 'Build Completed'
             sh 'docker logout || true'
         }
 
         success {
             echo "Docker Image: ${IMAGE_NAME}:${IMAGE_TAG}"
-            echo "Deployment Successful"
+            echo 'Deployment Successful'
         }
 
         failure {
-            echo "Pipeline Failed"
+            echo 'Pipeline Failed'
         }
     }
 }
