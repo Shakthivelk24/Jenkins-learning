@@ -1,0 +1,121 @@
+pipeline {
+    agent {
+      label 'shakthiAgent'
+    }
+
+    environment {
+        IMAGE_NAME = "shakthivelk24/github-profile-summarizer"
+        IMAGE_TAG = "v${BUILD_NUMBER}"
+        MAX_REPOS = "50"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Create .env') {
+            steps {
+                dir('Project-2-React-github-summarizer') {
+                    withCredentials([
+                        string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')
+                    ]) {
+                        sh '''
+                            echo "VITE_GITHUB_TOKEN=$GITHUB_TOKEN" > .env
+                            echo "VITE_MAX_REPOS=$MAX_REPOS" >> .env
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('Project-2-React-github-summarizer') {
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Build React App') {
+            steps {
+                dir('Project-2-React-github-summarizer') {
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir('Project-2-React-github-summarizer') {
+                    sh """
+                        docker build \
+                        -t ${IMAGE_NAME}:${IMAGE_TAG} \
+                        -t ${IMAGE_NAME}:latest \
+                        .
+                    """
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'DockerHub',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login \
+                        -u "$DOCKER_USER" \
+                        --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh """
+                    docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                    docker push ${IMAGE_NAME}:latest
+                """
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                sh """
+                    docker rm -f github-profile-summarizer || true
+
+                    docker run -d \
+                        --name github-profile-summarizer \
+                        -p 8081:80 \
+                        ${IMAGE_NAME}:${IMAGE_TAG}
+                """
+            }
+        }
+
+    }
+
+    post {
+        always {
+            echo "Build Completed"
+            sh 'docker logout || true'
+        }
+
+        success {
+            echo "Docker Image: ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Deployment Successful"
+        }
+
+        failure {
+            echo "Pipeline Failed"
+        }
+    }
+}
