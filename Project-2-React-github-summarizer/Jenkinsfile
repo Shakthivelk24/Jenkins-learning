@@ -3,6 +3,10 @@ pipeline {
       label 'shakthiAgent'
     }
 
+    tools {
+        nodejs 'NodeJS'
+    }
+
     environment {
         IMAGE_NAME = "shakthivelk24/github-profile-summarizer"
         IMAGE_TAG = "v${BUILD_NUMBER}"
