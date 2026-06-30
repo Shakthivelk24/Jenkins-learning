@@ -38,7 +38,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('Project-2-React-github-summarizer') {
-                    sh 'npm.cmd install'
+                    sh 'npm.cmd ci'
                 }
             }
         }
