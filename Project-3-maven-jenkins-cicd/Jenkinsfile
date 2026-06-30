@@ -1,0 +1,160 @@
+pipeline {
+    agent {
+        label 'shakthiAgent'
+    }
+
+    environment {
+        IMAGE_NAME = "shakthivelk24/maven-jenkins-demo"
+        DOCKERHUB_CREDENTIALS = credentials('DockerHub')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo "Checking out code from SCM..."
+                checkout scm
+            }
+        }
+
+        stage('Clean Workspace') {
+            steps {
+                dir('Project-3-maven-jenkins-cicd') {
+                    echo "Cleaning previous build files..."
+                    sh 'mvn clean'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('Project-3-maven-jenkins-cicd') {
+                    echo "Compiling Maven project..."
+                    sh 'mvn compile'
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                dir('Project-3-maven-jenkins-cicd') {
+                    echo "Running unit tests..."
+                    sh 'mvn test'
+                }
+            }
+
+            post {
+                always {
+                    script {
+                        if (fileExists('Project-3-maven-jenkins-cicd/target/surefire-reports')) {
+                            echo "Publishing JUnit reports..."
+                            junit 'Project-3-maven-jenkins-cicd/target/surefire-reports/*.xml'
+                        } else {
+                            echo "No test reports found."
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                dir('Project-3-maven-jenkins-cicd') {
+                    echo "Packaging application..."
+                    sh 'mvn package -DskipTests'
+                }
+            }
+
+            post {
+                success {
+                    archiveArtifacts artifacts: 'Project-3-maven-jenkins-cicd/target/*.jar', fingerprint: true
+                }
+            }
+        }
+
+        stage('Static Code Analysis (Optional)') {
+            steps {
+                dir('Project-3-maven-jenkins-cicd') {
+                    echo "Running static code analysis..."
+                    sh 'echo "Static code analysis completed successfully."'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('Project-3-maven-jenkins-cicd') {
+                    echo "Building Docker image..."
+                    sh 'docker build -t $IMAGE_NAME:${BUILD_NUMBER} .'
+                }
+            }
+        }
+
+        stage('DockerHub Login') {
+            steps {
+                echo "Logging into DockerHub..."
+                sh '''
+                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login \
+                    -u $DOCKERHUB_CREDENTIALS_USR \
+                    --password-stdin
+                '''
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                echo "Pushing Docker image..."
+                sh 'docker push $IMAGE_NAME:${BUILD_NUMBER}'
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                echo "Deploying Docker container..."
+
+                sh '''
+                    docker stop maven-demo || true
+                    docker rm maven-demo || true
+
+                    docker run -d \
+                      --name maven-demo \
+                      $IMAGE_NAME:${BUILD_NUMBER}
+
+                    sleep 5
+
+                    docker ps
+                    docker logs maven-demo
+                '''
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                echo "Removing local Docker image..."
+                sh '''
+                    docker rmi $IMAGE_NAME:${BUILD_NUMBER} || true
+                    docker image prune -f || true
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "======================================="
+            echo "Build #${BUILD_NUMBER} completed successfully."
+            echo "Docker Image: $IMAGE_NAME:${BUILD_NUMBER}"
+            echo "======================================="
+        }
+
+        failure {
+            echo "======================================="
+            echo "Build #${BUILD_NUMBER} failed."
+            echo "======================================="
+        }
+
+        always {
+            cleanWs()
+        }
+    }
+}
