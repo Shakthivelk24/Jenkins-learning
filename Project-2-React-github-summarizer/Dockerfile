@@ -1,3 +1,4 @@
+# This Dockerfile is designed to build and serve a React application using a multi-stage build process. The first stage uses a Node.js environment to build the React app, while the second stage uses Nginx to serve the built static files.
 # ---------- Stage 1: Build React app ----------
 FROM node:20-alpine AS build
 WORKDIR /app
