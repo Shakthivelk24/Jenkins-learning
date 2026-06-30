@@ -34,22 +34,11 @@ pipeline {
                 }
             }
         }
-        stage('Debug Node') {
-            steps {
-                sh '''
-                which node
-                which npm
-                node -v
-                npm -v
-                echo $PATH
-               '''
-            }
-        }
 
         stage('Install Dependencies') {
             steps {
                 dir('Project-2-React-github-summarizer') {
-                    sh 'npm install'
+                    sh 'npm.cmd install'
                 }
             }
         }
@@ -57,7 +46,7 @@ pipeline {
         stage('Build React App') {
             steps {
                 dir('Project-2-React-github-summarizer') {
-                    sh 'npm run build'
+                    sh 'npm.cmd run build'
                 }
             }
         }
@@ -117,10 +106,6 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Build Completed'
-            sh 'docker logout || true'
-        }
 
         success {
             echo "Docker Image: ${IMAGE_NAME}:${IMAGE_TAG}"
