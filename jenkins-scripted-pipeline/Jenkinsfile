@@ -1,0 +1,14 @@
+node('shakthiAgent') {
+
+    stage('Build') {
+        sh 'echo "Building project..."'
+    }
+
+    stage('Test') {
+        sh 'echo "Running tests..."'
+    }
+
+    stage('Deploy') {
+        sh 'echo "Deploying application..."'
+    }
+}
