@@ -1,0 +1,25 @@
+pipeline {
+    agent {
+        label 'shakthiAgent'
+    }
+
+    stages {
+        stage('Shakthi') {
+            steps {
+                sh 'echo shakthi...'
+            }
+        }
+
+        stage('Vel') {
+            steps {
+                sh 'echo Vel...'
+            }
+        }
+
+        stage('K') {
+            steps {
+                sh 'echo K...'
+            }
+        }
+    }
+}
