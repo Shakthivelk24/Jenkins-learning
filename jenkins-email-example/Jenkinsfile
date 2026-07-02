@@ -1,0 +1,28 @@
+pipeline {
+    agent {
+        label 'shakthiAgent'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building project...'
+            }
+        }
+    }
+
+    post {
+        always {
+            emailext(
+                to: 'shakthivelk1124@gmail.com',
+                subject: "Jenkins Build: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
+                body: """
+                Job Name: ${env.JOB_NAME}
+                Build Number: ${env.BUILD_NUMBER}
+                Status: ${currentBuild.currentResult}
+                Build URL: ${env.BUILD_URL}
+            """
+            )
+        }
+    }
+}
